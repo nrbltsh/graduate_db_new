@@ -54,10 +54,33 @@ form.mb-4 .btn {
 }
 
 /* Стили для графиков */
-canvas {
+canvas
     max-width: 100%;
     background-color: #fff;
     border-radius: 5px;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для пагинации */
+.pagination {
+    margin-top: 20px;
+}
+
+.page-link {
+    border-radius: 5px;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+    cursor: not-allowed;
+}
+
+/* Стили для кнопки экспорта */
+.btn-success {
+    border-radius: 5px;
 }

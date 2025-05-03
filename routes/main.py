@@ -1,16 +1,67 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required
 from models import Graduate, Tag, graduate_tags, db
 from sqlalchemy import or_, and_
+import csv
+import io
+import os
 
 main_bp = Blueprint('main', __name__)
 
 
-# Главная страница: список выпускников с фильтрацией
+# Главная страница: список выпускников с фильтрацией и пагинацией
 @main_bp.route('/')
 @login_required
 def index():
     # Параметры фильтрации
+    name = request.args.get('name', '')
+    graduation_year = request.args.get('graduation_year', '')
+    faculty = request.args.get('faculty', '')
+    tags = request.args.get('tags', '')
+
+    # Параметры пагинации
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Количество записей на странице
+
+    # Базовый запрос
+    query = Graduate.query
+
+    # Применение фильтров
+    if name:
+        query = query.filter(Graduate.name.ilike(f'%{name}%'))
+    if graduation_year:
+        query = query.filter(Graduate.graduation_year == graduation_year)
+    if faculty:
+        query = query.filter(Graduate.faculty.ilike(f'%{faculty}%'))
+    if tags:
+        tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
+        for tag_name in tag_list:
+            query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
+
+    # Сортировка
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    order = getattr(Graduate, sort_by)
+    if sort_order == 'desc':
+        order = order.desc()
+
+    # Пагинация
+    pagination = query.order_by(order).paginate(page=page, per_page=per_page, error_out=False)
+    graduates = pagination.items
+
+    # Доступные теги для формы
+    all_tags = Tag.query.all()
+
+    return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
+                           name=name, graduation_year=graduation_year, faculty=faculty, tags=tags,
+                           all_tags=all_tags, pagination=pagination)
+
+
+# Экспорт в CSV
+@main_bp.route('/export')
+@login_required
+def export():
+    # Параметры фильтрации (те же, что в index)
     name = request.args.get('name', '')
     graduation_year = request.args.get('graduation_year', '')
     faculty = request.args.get('faculty', '')
@@ -38,14 +89,34 @@ def index():
     if sort_order == 'desc':
         order = order.desc()
 
-    # Получение результатов
+    # Получение всех записей (без пагинации для экспорта)
     graduates = query.order_by(order).all()
 
-    # Доступные теги для формы
-    all_tags = Tag.query.all()
+    # Создание CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Факультет', 'Биография', 'Теги'])
 
-    return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
-                           name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, all_tags=all_tags)
+    for graduate in graduates:
+        tags = ', '.join([tag.name for tag in graduate.tags])
+        writer.writerow([
+            graduate.id,
+            graduate.name,
+            graduate.group,
+            graduate.graduation_year,
+            graduate.faculty,
+            graduate.bio or '',
+            tags
+        ])
+
+    # Подготовка ответа
+    output.seek(0)
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8')),
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='graduates_export.csv'
+    )
 
 
 # Страница профиля выпускника

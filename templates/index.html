@@ -24,24 +24,32 @@
     </div>
 </form>
 
+<!-- Кнопки экспорта и добавления -->
+<div class="mb-3">
+    <a href="{{ url_for('main.export', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-success">Экспорт в CSV</a>
+    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+    <a href="{{ url_for('graduate.add') }}" class="btn btn-primary ms-2">Добавить выпускника</a>
+    {% endif %}
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Фото</th>
             <th>
-                <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">ID</a>
+                <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">ID</a>
             </th>
             <th>
-                <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Имя</a>
+                <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Имя</a>
             </th>
             <th>
-                <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Группа</a>
+                <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Группа</a>
             </th>
             <th>
-                <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Год выпуска</a>
+                <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Год выпуска</a>
             </th>
             <th>
-                <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Факультет</a>
+                <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Факультет</a>
             </th>
             <th>Теги</th>
             {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
@@ -79,7 +87,41 @@
         {% endfor %}
     </tbody>
 </table>
-{% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-<a href="{{ url_for('graduate.add') }}" class="btn btn-primary">Добавить выпускника</a>
+
+<!-- Пагинация -->
+{% if pagination.pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Предыдущая</a>
+        </li>
+        {% endif %}
+
+        {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=3, right_edge=1) %}
+            {% if page_num %}
+                {% if page_num == pagination.page %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.index', page=page_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">{{ page_num }}</a>
+                </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Следующая</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endif %}
 {% endblock %}

@@ -36,7 +36,6 @@ def add():
                     tags.append(tag)
 
             graduate = Graduate(
-                id=int(request.form['id']),
                 name=request.form['name'],
                 group=request.form['group'],
                 graduation_year=request.form['graduation_year'],
