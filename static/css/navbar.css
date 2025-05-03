@@ -1,0 +1,33 @@
+/* Стиль для навигационной панели */
+.navbar {
+    background-color: #343a40; /* Темно-серый фон */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    transition: background-color 0.3s ease; /* Плавный переход для смены темы */
+}
+
+.navbar-brand {
+    color: #fff !important; /* Белый цвет бренда */
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important; /* Белый цвет ссылок */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #007bff !important; /* Синий акцент при наведении и для активной ссылки */
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(255, 255, 255, 0.5)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}

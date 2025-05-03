@@ -1,0 +1,14 @@
+/* Стили для форм поиска и загрузки */
+form.mb-4 .form-control,
+.upload-form .form-control {
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+}
+
+form.mb-4 .btn,
+.upload-form .btn {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600; /* Open Sans Semibold */
+}

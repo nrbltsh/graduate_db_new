@@ -3,34 +3,50 @@
 {% block content %}
 <h1>Статистика</h1>
 
-<div class="row">
-    <!-- Статистика по годам -->
-    <div class="col-md-6">
-        <h3>Выпускники по годам</h3>
-        <canvas id="yearsChart"></canvas>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Выпускники по годам</h5>
+                <canvas id="yearsChart"></canvas>
+            </div>
+        </div>
     </div>
-    <!-- Статистика по факультетам -->
-    <div class="col-md-6">
-        <h3>Выпускники по факультетам</h3>
-        <canvas id="facultiesChart"></canvas>
+    <div class="col">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Выпускники по факультетам</h5>
+                <canvas id="facultiesChart"></canvas>
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="row mt-4">
-    <!-- Статистика по тегам -->
-    <div class="col-md-6">
-        <h3>Выпускники по тегам</h3>
-        <canvas id="tagsChart"></canvas>
+    <div class="col">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Выпускники по тегам</h5>
+                <canvas id="tagsChart"></canvas>
+            </div>
+        </div>
     </div>
-    <!-- Статистика по группам -->
-    <div class="col-md-6">
-        <h3>Выпускники по группам</h3>
-        <canvas id="groupsChart"></canvas>
+    <div class="col">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Выпускники по группам</h5>
+                <canvas id="groupsChart"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Цвета для графиков
+    const primaryColor = '#007bff';
+    const secondaryColor = '#6c757d';
+    const successColor = '#28a745';
+    const warningColor = '#ffc107';
+    const infoColor = '#17a2b8';
+
     // График по годам
     const yearsCtx = document.getElementById('yearsChart').getContext('2d');
     new Chart(yearsCtx, {
@@ -40,8 +56,8 @@
             datasets: [{
                 label: 'Количество выпускников',
                 data: [{% for year in years_data %}{{ year.count }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: primaryColor + '80',
+                borderColor: primaryColor,
                 borderWidth: 1
             }]
         },
@@ -50,7 +66,24 @@
                 y: {
                     beginAtZero: true
                 }
-            }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Open Sans'
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                }
+            },
+            font: {
+                family: 'Open Sans'
+            },
+            maintainAspectRatio: false,
+            height: 250 // Уменьшенная высота
         }
     });
 
@@ -64,21 +97,40 @@
                 label: 'Количество выпускников',
                 data: [{% for faculty in faculties_data %}{{ faculty.count }}{% if not loop.last %},{% endif %}{% endfor %}],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)'
+                    primaryColor + '80',
+                    successColor + '80',
+                    warningColor + '80',
+                    infoColor + '80',
+                    secondaryColor + '80'
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)'
+                    primaryColor,
+                    successColor,
+                    warningColor,
+                    infoColor,
+                    secondaryColor
                 ],
                 borderWidth: 1
             }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Open Sans'
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                }
+            },
+            font: {
+                family: 'Open Sans'
+            },
+            maintainAspectRatio: false,
+            height: 250 // Уменьшенная высота
         }
     });
 
@@ -91,8 +143,8 @@
             datasets: [{
                 label: 'Количество выпускников',
                 data: [{% for tag in tags_data %}{{ tag.count }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: successColor + '80',
+                borderColor: successColor,
                 borderWidth: 1
             }]
         },
@@ -101,7 +153,24 @@
                 y: {
                     beginAtZero: true
                 }
-            }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Open Sans'
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                }
+            },
+            font: {
+                family: 'Open Sans'
+            },
+            maintainAspectRatio: false,
+            height: 250 // Уменьшенная высота
         }
     });
 
@@ -115,21 +184,40 @@
                 label: 'Количество выпускников',
                 data: [{% for group in groups_data %}{{ group.count }}{% if not loop.last %},{% endif %}{% endfor %}],
                 backgroundColor: [
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)'
+                    warningColor + '80',
+                    primaryColor + '80',
+                    successColor + '80',
+                    infoColor + '80',
+                    secondaryColor + '80'
                 ],
                 borderColor: [
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)'
+                    warningColor,
+                    primaryColor,
+                    successColor,
+                    infoColor,
+                    secondaryColor
                 ],
                 borderWidth: 1
             }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Open Sans'
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                }
+            },
+            font: {
+                family: 'Open Sans'
+            },
+            maintainAspectRatio: false,
+            height: 250 // Уменьшенная высота
         }
     });
 </script>

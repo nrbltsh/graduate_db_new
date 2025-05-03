@@ -1,0 +1,26 @@
+/* Стили для модальных окон */
+.modal-content {
+    border-radius: 0.5rem;
+    background-color: #fff;
+    color: #495057;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для смены темы */
+}
+
+.modal-header {
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.modal-title {
+    font-weight: 700; /* Montserrat */
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}

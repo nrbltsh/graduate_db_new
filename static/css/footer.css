@@ -1,0 +1,10 @@
+/* Стиль для футера */
+footer {
+    background-color: #e9ecef; /* Чуть более темный серый фон */
+    border-top: 1px solid #dee2e6;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    color: #6c757d; /* Более темный серый текст */
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для смены темы */
+}
