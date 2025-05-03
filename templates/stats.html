@@ -4,73 +4,132 @@
 <h1>Статистика</h1>
 
 <div class="row">
+    <!-- Статистика по годам -->
     <div class="col-md-6">
         <h3>Выпускники по годам</h3>
-        <canvas id="yearsChart" height="200"></canvas>
+        <canvas id="yearsChart"></canvas>
     </div>
+    <!-- Статистика по факультетам -->
     <div class="col-md-6">
         <h3>Выпускники по факультетам</h3>
-        <canvas id="facultiesChart" height="200"></canvas>
+        <canvas id="facultiesChart"></canvas>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<div class="row mt-4">
+    <!-- Статистика по тегам -->
+    <div class="col-md-6">
+        <h3>Выпускники по тегам</h3>
+        <canvas id="tagsChart"></canvas>
+    </div>
+    <!-- Статистика по группам -->
+    <div class="col-md-6">
+        <h3>Выпускники по группам</h3>
+        <canvas id="groupsChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // График по годам
-    const yearsData = {
-        labels: [{% for year, count in years_data %}'{{ year }}',{% endfor %}],
-        datasets: [{
-            label: 'Количество выпускников',
-            data: [{% for year, count in years_data %}{{ count }},{% endfor %}],
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-        }]
-    };
-
-    const yearsChart = new Chart(document.getElementById('yearsChart'), {
+    const yearsCtx = document.getElementById('yearsChart').getContext('2d');
+    new Chart(yearsCtx, {
         type: 'bar',
-        data: yearsData,
+        data: {
+            labels: [{% for year in years_data %}'{{ year.graduation_year }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Количество выпускников',
+                data: [{% for year in years_data %}{{ year.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
         options: {
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
 
     // График по факультетам
-    const facultiesData = {
-        labels: [{% for faculty, count in faculties_data %}'{{ faculty }}',{% endfor %}],
-        datasets: [{
-            label: 'Количество выпускников',
-            data: [{% for faculty, count in faculties_data %}{{ count }},{% endfor %}],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.5)',
-                'rgba(54, 162, 235, 0.5)',
-                'rgba(255, 206, 86, 0.5)',
-                'rgba(75, 192, 192, 0.5)',
-                'rgba(153, 102, 255, 0.5)',
-                'rgba(255, 159, 64, 0.5)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    };
-
-    const facultiesChart = new Chart(document.getElementById('facultiesChart'), {
+    const facultiesCtx = document.getElementById('facultiesChart').getContext('2d');
+    new Chart(facultiesCtx, {
         type: 'pie',
-        data: facultiesData,
+        data: {
+            labels: [{% for faculty in faculties_data %}'{{ faculty.faculty }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Количество выпускников',
+                data: [{% for faculty in faculties_data %}{{ faculty.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // График по тегам
+    const tagsCtx = document.getElementById('tagsChart').getContext('2d');
+    new Chart(tagsCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for tag in tags_data %}'{{ tag.name }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Количество выпускников',
+                data: [{% for tag in tags_data %}{{ tag.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
         options: {
-            plugins: {
-                legend: { position: 'right' }
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
+        }
+    });
+
+    // График по группам
+    const groupsCtx = document.getElementById('groupsChart').getContext('2d');
+    new Chart(groupsCtx, {
+        type: 'pie',
+        data: {
+            labels: [{% for group in groups_data %}'{{ group.group }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Количество выпускников',
+                data: [{% for group in groups_data %}{{ group.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
         }
     });
 </script>

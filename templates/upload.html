@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Загрузка выпускников из CSV{% endblock %}
+{% block content %}
+<h1>Загрузка выпускников из CSV</h1>
+<p>Загрузите CSV-файл с данными выпускников. Файл должен содержать столбцы: <strong>ID, Имя, Группа, Год выпуска, Факультет, Биография, Теги</strong>. Теги указываются через запятую. ID игнорируется (генерируется автоматически).</p>
+<p><a href="{{ url_for('main.export') }}" class="btn btn-secondary btn-sm">Скачать пример CSV</a></p>
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Выберите CSV-файл</label>
+        <input type="file" class="form-control" name="file" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

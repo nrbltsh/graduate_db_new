@@ -17,20 +17,14 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 @login_required
 def index():
-    # Параметры фильтрации
     name = request.args.get('name', '')
     graduation_year = request.args.get('graduation_year', '')
     faculty = request.args.get('faculty', '')
     tags = request.args.get('tags', '')
-
-    # Параметры пагинации
     page = request.args.get('page', 1, type=int)
-    per_page = 10  # Количество записей на странице
+    per_page = 10
 
-    # Базовый запрос
     query = Graduate.query
-
-    # Применение фильтров
     if name:
         query = query.filter(Graduate.name.ilike(f'%{name}%'))
     if graduation_year:
@@ -42,18 +36,14 @@ def index():
         for tag_name in tag_list:
             query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
 
-    # Сортировка
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     order = getattr(Graduate, sort_by)
     if sort_order == 'desc':
         order = order.desc()
 
-    # Пагинация
     pagination = query.order_by(order).paginate(page=page, per_page=per_page, error_out=False)
     graduates = pagination.items
-
-    # Доступные теги для формы
     all_tags = Tag.query.all()
 
     return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
@@ -65,16 +55,12 @@ def index():
 @main_bp.route('/export')
 @login_required
 def export():
-    # Параметры фильтрации
     name = request.args.get('name', '')
     graduation_year = request.args.get('graduation_year', '')
     faculty = request.args.get('faculty', '')
     tags = request.args.get('tags', '')
 
-    # Базовый запрос
     query = Graduate.query
-
-    # Применение фильтров
     if name:
         query = query.filter(Graduate.name.ilike(f'%{name}%'))
     if graduation_year:
@@ -86,17 +72,13 @@ def export():
         for tag_name in tag_list:
             query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
 
-    # Сортировка
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     order = getattr(Graduate, sort_by)
     if sort_order == 'desc':
         order = order.desc()
 
-    # Получение всех записей
     graduates = query.order_by(order).all()
-
-    # Создание CSV
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Факультет', 'Биография', 'Теги'])
@@ -126,16 +108,12 @@ def export():
 @main_bp.route('/export_pdf')
 @login_required
 def export_pdf():
-    # Параметры фильтрации
     name = request.args.get('name', '')
     graduation_year = request.args.get('graduation_year', '')
     faculty = request.args.get('faculty', '')
     tags = request.args.get('tags', '')
 
-    # Базовый запрос
     query = Graduate.query
-
-    # Применение фильтров
     if name:
         query = query.filter(Graduate.name.ilike(f'%{name}%'))
     if graduation_year:
@@ -147,17 +125,13 @@ def export_pdf():
         for tag_name in tag_list:
             query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
 
-    # Сортировка
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     order = getattr(Graduate, sort_by)
     if sort_order == 'desc':
         order = order.desc()
 
-    # Получение всех записей
     graduates = query.order_by(order).all()
-
-    # Создание PDF
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5 * inch, bottomMargin=0.5 * inch)
     data = [['ID', 'Имя', 'Группа', 'Год выпуска', 'Факультет', 'Теги']]
@@ -226,4 +200,15 @@ def stats():
         db.func.count(Graduate.id).label('count')
     ).group_by(Graduate.faculty).all()
 
-    return render_template('stats.html', years_data=years_data, faculties_data=faculties_data)
+    tags_data = db.session.query(
+        Tag.name,
+        db.func.count(graduate_tags.c.graduate_id).label('count')
+    ).join(graduate_tags).group_by(Tag.name).all()
+
+    groups_data = db.session.query(
+        Graduate.group,
+        db.func.count(Graduate.id).label('count')
+    ).group_by(Graduate.group).all()
+
+    return render_template('stats.html', years_data=years_data, faculties_data=faculties_data,
+                           tags_data=tags_data, groups_data=groups_data)

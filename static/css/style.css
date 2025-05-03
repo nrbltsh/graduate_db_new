@@ -100,3 +100,12 @@ canvas {
     border: 1px solid #0056b3;
     color: white;
 }
+
+/* Стили для формы загрузки */
+.upload-form .form-control {
+    border-radius: 5px;
+}
+
+.upload-form .btn {
+    border-radius: 5px;
+}
