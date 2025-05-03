@@ -20,7 +20,7 @@
         </p>
         {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
         <a href="{{ url_for('edit', id=graduate.id) }}" class="btn btn-warning">Редактировать</a>
-        <a href="{{ url_for('delete', id=graduate.id) }}" class="btn btn-danger" onclick="return confirm('Вы уверены?');">Удалить</a>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('delete', id=graduate.id) }}">Удалить</button>
         {% endif %}
         <a href="{{ url_for('index') }}" class="btn btn-secondary">Назад</a>
     </div>

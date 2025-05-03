@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Фиксированная навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">Graduates DB</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -33,7 +34,7 @@
                         <span class="nav-link">Привет, {{ current_user.username }} ({{ current_user.role }})</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Выйти</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -47,7 +48,9 @@
             </div>
         </div>
     </nav>
-    <div class="container mt-4">
+
+    <!-- Контент страницы -->
+    <div class="container mt-5 pt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -60,11 +63,65 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Модальное окно для подтверждения удаления -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить этого выпускника?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <a id="confirmDelete" class="btn btn-danger" href="#">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для подтверждения выхода -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Подтверждение выхода</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите выйти из системы?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <a class="btn btn-primary" href="{{ url_for('logout') }}">Выйти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижний футер -->
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">
             <p class="mb-0">Свяжитесь с нами: <a href="mailto:example@email.com">example@email.com</a></p>
         </div>
     </footer>
+
+    <!-- JavaScript для модального окна удаления -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Обработка открытия модального окна удаления
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Кнопка, вызвавшая модальное окно
+                var deleteUrl = button.getAttribute('data-delete-url'); // URL для удаления
+                var confirmButton = deleteModal.querySelector('#confirmDelete');
+                confirmButton.setAttribute('href', deleteUrl); // Устанавливаем URL для кнопки "Удалить"
+            });
+        });
+    </script>
 </body>
 </html>

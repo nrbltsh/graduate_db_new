@@ -6,10 +6,10 @@ body {
 }
 
 .navbar {
-    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.container.mt-4 {
+.container.mt-5.pt-4 {
     flex: 1;
 }
 
@@ -28,4 +28,18 @@ footer {
 
 .img-fluid {
     border-radius: 5px;
+}
+
+/* Стили для модальных окон */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
 }
