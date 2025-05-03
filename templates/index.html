@@ -27,6 +27,7 @@
 <!-- Кнопки экспорта и добавления -->
 <div class="mb-3">
     <a href="{{ url_for('main.export', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-success">Экспорт в CSV</a>
+    <a href="{{ url_for('main.export_pdf', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-info ms-2">Экспорт в PDF</a>
     {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
     <a href="{{ url_for('graduate.add') }}" class="btn btn-primary ms-2">Добавить выпускника</a>
     {% endif %}

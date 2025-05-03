@@ -24,7 +24,7 @@ def add():
                     file.save(os.path.join(graduate_bp.app.config['UPLOAD_FOLDER'], filename))
                     photo_path = filename
 
-            tags_input = request.form.get('tags', '').split(',')
+            tags_input = request.form.getlist('tags')  # Choices.js отправляет список
             tags = []
             for tag_name in tags_input:
                 tag_name = tag_name.strip()
@@ -50,7 +50,14 @@ def add():
             return redirect(url_for('main.index'))
         except Exception as e:
             flash(str(e), 'danger')
-    return render_template('add.html', tags=Tag.query.all())
+
+    # Получаем уникальные группы и факультеты
+    groups = db.session.query(Graduate.group).distinct().all()
+    groups = [group[0] for group in groups if group[0]]
+    faculties = db.session.query(Graduate.faculty).distinct().all()
+    faculties = [faculty[0] for faculty in faculties if faculty[0]]
+
+    return render_template('add.html', tags=Tag.query.all(), groups=groups, faculties=faculties)
 
 
 # Страница редактирования выпускника
@@ -76,7 +83,7 @@ def edit(id):
                     file.save(os.path.join(graduate_bp.app.config['UPLOAD_FOLDER'], filename))
                     graduate.photo = filename
 
-            tags_input = request.form.get('tags', '').split(',')
+            tags_input = request.form.getlist('tags')  # Choices.js отправляет список
             tags = []
             for tag_name in tags_input:
                 tag_name = tag_name.strip()
@@ -93,7 +100,14 @@ def edit(id):
             return redirect(url_for('main.graduate', id=graduate.id))
         except Exception as e:
             flash(str(e), 'danger')
-    return render_template('edit.html', graduate=graduate, tags=Tag.query.all())
+
+    # Получаем уникальные группы и факультеты
+    groups = db.session.query(Graduate.group).distinct().all()
+    groups = [group[0] for group in groups if group[0]]
+    faculties = db.session.query(Graduate.faculty).distinct().all()
+    faculties = [faculty[0] for faculty in faculties if faculty[0]]
+
+    return render_template('edit.html', graduate=graduate, tags=Tag.query.all(), groups=groups, faculties=faculties)
 
 
 # Удаление выпускника

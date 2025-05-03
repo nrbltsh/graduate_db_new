@@ -54,7 +54,7 @@ form.mb-4 .btn {
 }
 
 /* Стили для графиков */
-canvas
+canvas {
     max-width: 100%;
     background-color: #fff;
     border-radius: 5px;
@@ -80,7 +80,23 @@ canvas
     cursor: not-allowed;
 }
 
-/* Стили для кнопки экспорта */
+/* Стили для кнопок экспорта */
 .btn-success {
     border-radius: 5px;
+}
+
+.btn-info {
+    border-radius: 5px;
+}
+
+/* Стили для Choices.js */
+.choices__inner {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.choices__list--multiple .choices__item {
+    background-color: #007bff;
+    border: 1px solid #0056b3;
+    color: white;
 }
