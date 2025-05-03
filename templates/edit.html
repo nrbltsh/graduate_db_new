@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать выпускника{% endblock %}
+{% block content %}
+<h1>Редактировать выпускника</h1>
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Имя</label>
+        <input type="text" class="form-control" name="name" value="{{ graduate.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Группа</label>
+        <input type="text" class="form-control" name="group" value="{{ graduate.group }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Год выпуска</label>
+        <input type="text" class="form-control" name="graduation_year" value="{{ graduate.graduation_year }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Факультет</label>
+        <input type="text" class="form-control" name="faculty" value="{{ graduate.faculty }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Биография</label>
+        <textarea class="form-control" name="bio" rows="5">{{ graduate.bio or '' }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Фото</label>
+        <input type="file" class="form-control" name="photo" accept="image/*">
+        {% if graduate.photo %}
+        <p>Текущее фото: <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" style="max-width: 100px;"></p>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Теги (через запятую)</label>
+        <input type="text" class="form-control" name="tags" value="{{ graduate.tags | map(attribute='name') | join(', ') }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{{ url_for('graduate', id=graduate.id) }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

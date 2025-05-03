@@ -17,3 +17,15 @@ footer {
     background-color: #f8f9fa;
     border-top: 1px solid #e7e7e7;
 }
+
+.alert {
+    margin-bottom: 20px;
+}
+
+.badge {
+    margin-right: 5px;
+}
+
+.img-fluid {
+    border-radius: 5px;
+}

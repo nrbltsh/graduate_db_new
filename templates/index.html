@@ -5,6 +5,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Фото</th>
             <th>
                 <a href="{{ url_for('index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc') }}">ID</a>
             </th>
@@ -20,19 +21,43 @@
             <th>
                 <a href="{{ url_for('index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc') }}">Факультет</a>
             </th>
+            <th>Теги</th>
+            {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+            <th>Действия</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
         {% for graduate in graduates %}
         <tr>
+            <td>
+                {% if graduate.photo %}
+                <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" style="width: 50px; height: 50px; object-fit: cover;">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No photo" style="width: 50px; height: 50px; object-fit: cover;">
+                {% endif %}
+            </td>
             <td>{{ graduate.id }}</td>
-            <td>{{ graduate.name }}</td>
+            <td><a href="{{ url_for('graduate', id=graduate.id) }}">{{ graduate.name }}</a></td>
             <td>{{ graduate.group }}</td>
             <td>{{ graduate.graduation_year }}</td>
             <td>{{ graduate.faculty }}</td>
+            <td>
+                {% for tag in graduate.tags %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
+                {% endfor %}
+            </td>
+            {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+            <td>
+                <a href="{{ url_for('edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
+                <a href="{{ url_for('delete', id=graduate.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?');">Удалить</a>
+            </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
 </table>
+{% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
 <a href="{{ url_for('add') }}" class="btn btn-primary">Добавить выпускника</a>
+{% endif %}
 {% endblock %}

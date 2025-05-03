@@ -14,21 +14,50 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">Список</a>
+                    </li>
+                    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'add' }}" href="{{ url_for('add') }}">Добавить</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'about' }}" href="{{ url_for('about') }}">О проекте</a>
+                    </li>
+                </ul>
                 <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Список</a>
+                        <span class="nav-link">Привет, {{ current_user.username }} ({{ current_user.role }})</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('add') }}">Добавить</a>
+                        <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'login' }}" href="{{ url_for('login') }}">Войти</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">О проекте</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'register' }}" href="{{ url_for('register') }}">Зарегистрироваться</a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
     <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </div>
     <footer class="bg-light py-3 mt-4">
