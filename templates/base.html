@@ -27,6 +27,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ 'active' if request.endpoint == 'about' }}" href="{{ url_for('about') }}">О проекте</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'stats' }}" href="{{ url_for('stats') }}">Статистика</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
@@ -116,10 +119,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             var deleteModal = document.getElementById('deleteModal');
             deleteModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget; // Кнопка, вызвавшая модальное окно
-                var deleteUrl = button.getAttribute('data-delete-url'); // URL для удаления
+                var button = event.relatedTarget;
+                var deleteUrl = button.getAttribute('data-delete-url');
                 var confirmButton = deleteModal.querySelector('#confirmDelete');
-                confirmButton.setAttribute('href', deleteUrl); // Устанавливаем URL для кнопки "Удалить"
+                confirmButton.setAttribute('href', deleteUrl);
             });
         });
     </script>

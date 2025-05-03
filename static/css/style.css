@@ -43,3 +43,21 @@ footer {
 .modal-footer {
     border-top: 1px solid #dee2e6;
 }
+
+/* Стили для формы поиска */
+form.mb-4 .form-control {
+    border-radius: 5px;
+}
+
+form.mb-4 .btn {
+    border-radius: 5px;
+}
+
+/* Стили для графиков */
+canvas {
+    max-width: 100%;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

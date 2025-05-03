@@ -2,24 +2,46 @@
 {% block title %}Список выпускников{% endblock %}
 {% block content %}
 <h1>Список выпускников</h1>
+
+<!-- Форма поиска -->
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="name" placeholder="Имя" value="{{ name }}">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="graduation_year" placeholder="Год выпуска" value="{{ graduation_year }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="faculty" placeholder="Факультет" value="{{ faculty }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="tags" placeholder="Теги (через запятую)" value="{{ tags }}">
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100">Найти</button>
+        </div>
+    </div>
+</form>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Фото</th>
             <th>
-                <a href="{{ url_for('index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc') }}">ID</a>
+                <a href="{{ url_for('index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">ID</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc') }}">Имя</a>
+                <a href="{{ url_for('index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Имя</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc') }}">Группа</a>
+                <a href="{{ url_for('index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Группа</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc') }}">Год выпуска</a>
+                <a href="{{ url_for('index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Год выпуска</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc') }}">Факультет</a>
+                <a href="{{ url_for('index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Факультет</a>
             </th>
             <th>Теги</th>
             {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}

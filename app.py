@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
+from sqlalchemy import or_, and_
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///graduates.db'
@@ -60,7 +61,7 @@ graduate_tags = db.Table('graduate_tags',
 # Callback для Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))  # Используем session.get вместо Query.get
+    return db.session.get(User, int(user_id))
 
 
 # Создание базы данных
@@ -76,17 +77,46 @@ with app.app_context():
         db.session.commit()
 
 
-# Главная страница: список выпускников
+# Главная страница: список выпускников с фильтрацией
 @app.route('/')
 @login_required
 def index():
+    # Параметры фильтрации
+    name = request.args.get('name', '')
+    graduation_year = request.args.get('graduation_year', '')
+    faculty = request.args.get('faculty', '')
+    tags = request.args.get('tags', '')
+
+    # Базовый запрос
+    query = Graduate.query
+
+    # Применение фильтров
+    if name:
+        query = query.filter(Graduate.name.ilike(f'%{name}%'))
+    if graduation_year:
+        query = query.filter(Graduate.graduation_year == graduation_year)
+    if faculty:
+        query = query.filter(Graduate.faculty.ilike(f'%{faculty}%'))
+    if tags:
+        tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
+        for tag_name in tag_list:
+            query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
+
+    # Сортировка
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     order = getattr(Graduate, sort_by)
     if sort_order == 'desc':
         order = order.desc()
-    graduates = Graduate.query.order_by(order).all()
-    return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order)
+
+    # Получение результатов
+    graduates = query.order_by(order).all()
+
+    # Доступные теги для формы
+    all_tags = Tag.query.all()
+
+    return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
+                           name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, all_tags=all_tags)
 
 
 # Страница добавления выпускника
@@ -98,7 +128,6 @@ def add():
         return redirect(url_for('index'))
     if request.method == 'POST':
         try:
-            # Обработка файла
             photo_path = None
             if 'photo' in request.files:
                 file = request.files['photo']
@@ -107,7 +136,6 @@ def add():
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     photo_path = filename
 
-            # Обработка тегов
             tags_input = request.form.get('tags', '').split(',')
             tags = []
             for tag_name in tags_input:
@@ -162,7 +190,6 @@ def edit(id):
             graduate.faculty = request.form['faculty']
             graduate.bio = request.form['bio']
 
-            # Обработка фото
             if 'photo' in request.files:
                 file = request.files['photo']
                 if file and allowed_file(file.filename):
@@ -170,7 +197,6 @@ def edit(id):
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     graduate.photo = filename
 
-            # Обработка тегов
             tags_input = request.form.get('tags', '').split(',')
             tags = []
             for tag_name in tags_input:
@@ -210,6 +236,25 @@ def delete(id):
 @login_required
 def about():
     return render_template('about.html')
+
+
+# Страница статистики
+@app.route('/stats')
+@login_required
+def stats():
+    # Подсчёт выпускников по годам
+    years_data = db.session.query(
+        Graduate.graduation_year,
+        db.func.count(Graduate.id).label('count')
+    ).group_by(Graduate.graduation_year).all()
+
+    # Подсчёт выпускников по факультетам
+    faculties_data = db.session.query(
+        Graduate.faculty,
+        db.func.count(Graduate.id).label('count')
+    ).group_by(Graduate.faculty).all()
+
+    return render_template('stats.html', years_data=years_data, faculties_data=faculties_data)
 
 
 # Страница регистрации
