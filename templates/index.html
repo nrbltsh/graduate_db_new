@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Список выпускников{% endblock %}
+{% block content %}
+<h1>Список выпускников</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                <a href="{{ url_for('index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc') }}">ID</a>
+            </th>
+            <th>
+                <a href="{{ url_for('index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc') }}">Имя</a>
+            </th>
+            <th>
+                <a href="{{ url_for('index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc') }}">Группа</a>
+            </th>
+            <th>
+                <a href="{{ url_for('index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc') }}">Год выпуска</a>
+            </th>
+            <th>
+                <a href="{{ url_for('index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc') }}">Факультет</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for graduate in graduates %}
+        <tr>
+            <td>{{ graduate.id }}</td>
+            <td>{{ graduate.name }}</td>
+            <td>{{ graduate.group }}</td>
+            <td>{{ graduate.graduation_year }}</td>
+            <td>{{ graduate.faculty }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('add') }}" class="btn btn-primary">Добавить выпускника</a>
+{% endblock %}

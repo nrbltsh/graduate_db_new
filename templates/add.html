@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Добавить выпускника{% endblock %}
+{% block content %}
+<h1>Добавить выпускника</h1>
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">ID</label>
+        <input type="number" class="form-control" name="id" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Имя</label>
+        <input type="text" class="form-control" name="name" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Группа</label>
+        <input type="text" class="form-control" name="group" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Год выпуска</label>
+        <input type="text" class="form-control" name="graduation_year" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Факультет</label>
+        <input type="text" class="form-control" name="faculty" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+{% endblock %}
