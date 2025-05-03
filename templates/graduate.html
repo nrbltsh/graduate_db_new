@@ -2,27 +2,25 @@
 {% block title %}{{ graduate.name }}{% endblock %}
 {% block content %}
 <h1>{{ graduate.name }}</h1>
-<div class="card">
-    <div class="card-body">
-        {% if graduate.photo %}
-        <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" class="img-fluid mb-3" style="max-width: 200px;">
-        {% else %}
-        <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No photo" class="img-fluid mb-3" style="max-width: 200px;">
-        {% endif %}
-        <p><strong>Группа:</strong> {{ graduate.group }}</p>
-        <p><strong>Год выпуска:</strong> {{ graduate.graduation_year }}</p>
-        <p><strong>Факультет:</strong> {{ graduate.faculty }}</p>
-        <p><strong>Биография:</strong> {{ graduate.bio or 'Нет информации' }}</p>
-        <p><strong>Теги:</strong>
-            {% for tag in graduate.tags %}
-            <span class="badge bg-secondary">{{ tag.name }}</span>
-            {% endfor %}
-        </p>
-        {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-        <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-warning">Редактировать</a>
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
-        {% endif %}
-        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Назад</a>
-    </div>
+<div>
+    {% if graduate.photo %}
+    <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" class="img-fluid mb-3" style="max-width: 200px;">
+    {% else %}
+    <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No photo" class="img-fluid mb-3" style="max-width: 200px;">
+    {% endif %}
+    <p><strong>Группа:</strong> {{ graduate.group }}</p>
+    <p><strong>Год выпуска:</strong> {{ graduate.graduation_year }}</p>
+    <p><strong>Факультет:</strong> {{ graduate.faculty }}</p>
+    <p><strong>Биография:</strong> {{ graduate.bio or 'Нет информации' }}</p>
+    <p><strong672>Теги:</strong>
+        {% for tag in graduate.tags %}
+        <span class="badge bg-secondary">{{ tag.name }}</span>
+        {% endfor %}
+    </p>
+    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+    <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-warning">Редактировать</a>
+    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
+    {% endif %}
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Назад</a>
 </div>
 {% endblock %}

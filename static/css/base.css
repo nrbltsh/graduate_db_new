@@ -1,29 +1,27 @@
 /* Общие стили */
 body {
-    background-color: #f8f9fa; /* Светлый серый фон */
+    background-color: #f8f9fa;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    color: #495057; /* Средний серый цвет текста */
+    color: #495057;
     font-size: 1rem;
     line-height: 1.6;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Russo One', sans-serif !important; /* Стильный шрифт для текста */
     font-weight: 400;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для смены темы */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6, .navbar-brand {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
+    font-family: 'Russo One', sans-serif !important; /* Выразительный заголовочный шрифт */
+    font-weight: normal;
     line-height: 1.2;
 }
 
-/* Стиль для контейнера основного содержимого */
 .container.mt-5.pt-4 {
     flex: 1;
 }
 
-/* Стиль для изображений */
 .img-fluid {
     border-radius: 0.25rem;
 }
