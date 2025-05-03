@@ -29,19 +29,19 @@
         <tr>
             <th>Фото</th>
             <th>
-                <a href="{{ url_for('index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">ID</a>
+                <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">ID</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Имя</a>
+                <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Имя</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Группа</a>
+                <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Группа</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Год выпуска</a>
+                <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Год выпуска</a>
             </th>
             <th>
-                <a href="{{ url_for('index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Факультет</a>
+                <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags) }}">Факультет</a>
             </th>
             <th>Теги</th>
             {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
@@ -60,7 +60,7 @@
                 {% endif %}
             </td>
             <td>{{ graduate.id }}</td>
-            <td><a href="{{ url_for('graduate', id=graduate.id) }}">{{ graduate.name }}</a></td>
+            <td><a href="{{ url_for('main.graduate', id=graduate.id) }}">{{ graduate.name }}</a></td>
             <td>{{ graduate.group }}</td>
             <td>{{ graduate.graduation_year }}</td>
             <td>{{ graduate.faculty }}</td>
@@ -71,8 +71,8 @@
             </td>
             {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
             <td>
-                <a href="{{ url_for('edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
-                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('delete', id=graduate.id) }}">Удалить</button>
+                <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
             </td>
             {% endif %}
         </tr>
@@ -80,6 +80,6 @@
     </tbody>
 </table>
 {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-<a href="{{ url_for('add') }}" class="btn btn-primary">Добавить выпускника</a>
+<a href="{{ url_for('graduate.add') }}" class="btn btn-primary">Добавить выпускника</a>
 {% endif %}
 {% endblock %}

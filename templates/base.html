@@ -10,25 +10,25 @@
     <!-- Фиксированная навигационная панель -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Graduates DB</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Graduates DB</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">Список</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">Список</a>
                     </li>
                     {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'add' }}" href="{{ url_for('add') }}">Добавить</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'graduate.add' }}" href="{{ url_for('graduate.add') }}">Добавить</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'about' }}" href="{{ url_for('about') }}">О проекте</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'main.about' }}" href="{{ url_for('main.about') }}">О проекте</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'stats' }}" href="{{ url_for('stats') }}">Статистика</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'main.stats' }}" href="{{ url_for('main.stats') }}">Статистика</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -41,10 +41,10 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'login' }}" href="{{ url_for('login') }}">Войти</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'auth.login' }}" href="{{ url_for('auth.login') }}">Войти</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'register' }}" href="{{ url_for('register') }}">Зарегистрироваться</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'auth.register' }}" href="{{ url_for('auth.register') }}">Зарегистрироваться</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <a class="btn btn-primary" href="{{ url_for('logout') }}">Выйти</a>
+                    <a class="btn btn-primary" href="{{ url_for('auth.logout') }}">Выйти</a>
                 </div>
             </div>
         </div>
