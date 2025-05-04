@@ -1,12 +1,25 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from models import Graduate, Tag, db, allowed_file
 from werkzeug.utils import secure_filename
 import os
 import csv
 import io
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 graduate_bp = Blueprint('graduate', __name__)
+
+# Убедимся, что папка для загрузки существует
+def ensure_upload_folder():
+    upload_folder = current_app.config.get('UPLOAD_FOLDER', 'static/uploads')
+    if not os.path.exists(upload_folder):
+        logger.info(f"Creating upload folder: {upload_folder}")
+        os.makedirs(upload_folder)
+    return upload_folder
 
 # Страница добавления выпускника
 @graduate_bp.route('/add', methods=['GET', 'POST'])
@@ -41,10 +54,21 @@ def add():
             photo_path = None
             if 'photo' in request.files:
                 file = request.files['photo']
-                if file and allowed_file(file.filename, graduate_bp.app.config['ALLOWED_EXTENSIONS']):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(graduate_bp.app.config['UPLOAD_FOLDER'], filename))
-                    photo_path = filename
+                logger.debug(f"Received file: {file.filename if file else 'None'}")
+                if file and file.filename:
+                    if allowed_file(file.filename, current_app.config.get('ALLOWED_EXTENSIONS', {'jpg', 'jpeg', 'png'})):
+                        filename = secure_filename(file.filename)
+                        upload_folder = ensure_upload_folder()
+                        file_path = os.path.join(upload_folder, filename)
+                        logger.debug(f"Saving file to: {file_path}")
+                        file.save(file_path)
+                        photo_path = filename
+                        logger.debug(f"File saved: {photo_path}")
+                    else:
+                        flash('Недопустимый формат файла. Разрешены: jpg, jpeg, png.', 'danger')
+                        return redirect(url_for('graduate.add'))
+                else:
+                    logger.debug("No file selected or empty filename")
 
             # Обработка тегов
             tags_input = request.form.getlist('tags')
@@ -73,6 +97,7 @@ def add():
             return redirect(url_for('main.index'))
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error adding graduate: {str(e)}")
             flash(f'Ошибка при добавлении выпускника: {str(e)}', 'danger')
             return redirect(url_for('graduate.add'))
 
@@ -117,10 +142,21 @@ def edit(id):
 
             if 'photo' in request.files:
                 file = request.files['photo']
-                if file and allowed_file(file.filename, graduate_bp.app.config['ALLOWED_EXTENSIONS']):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(graduate_bp.app.config['UPLOAD_FOLDER'], filename))
-                    graduate.photo = filename
+                logger.debug(f"Received file: {file.filename if file else 'None'}")
+                if file and file.filename:
+                    if allowed_file(file.filename, current_app.config.get('ALLOWED_EXTENSIONS', {'jpg', 'jpeg', 'png'})):
+                        filename = secure_filename(file.filename)
+                        upload_folder = ensure_upload_folder()
+                        file_path = os.path.join(upload_folder, filename)
+                        logger.debug(f"Saving file to: {file_path}")
+                        file.save(file_path)
+                        graduate.photo = filename
+                        logger.debug(f"File saved: {graduate.photo}")
+                    else:
+                        flash('Недопустимый формат файла. Разрешены: jpg, jpeg, png.', 'danger')
+                        return redirect(url_for('graduate.edit', id=id))
+                else:
+                    logger.debug("No file selected or empty filename")
 
             tags_input = request.form.getlist('tags')
             tags = []
@@ -139,12 +175,13 @@ def edit(id):
             return redirect(url_for('main.graduate', id=graduate.id))
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error updating graduate: {str(e)}")
             flash(f'Ошибка при обновлении данных: {str(e)}', 'danger')
             return redirect(url_for('graduate.edit', id=id))
 
     return render_template('edit.html', graduate=graduate, tags=Tag.query.all())
 
-# Удаление выпускника
+# Удаление выпускника с переиндексацией id
 @graduate_bp.route('/delete/<int:id>')
 @login_required
 def delete(id):
@@ -153,12 +190,28 @@ def delete(id):
         return redirect(url_for('main.index'))
     graduate = Graduate.query.get_or_404(id)
     try:
+        # Удаляем запись
         db.session.delete(graduate)
         db.session.commit()
-        flash('Выпускник удалён!', 'success')
+
+        # Переиндексация оставшихся записей
+        graduates = Graduate.query.order_by(Graduate.id).all()
+        new_id = 1
+        for grad in graduates:
+            # Обновляем связи в graduate_tags
+            db.session.execute(
+                db.text("UPDATE graduate_tags SET graduate_id = :new_id WHERE graduate_id = :old_id"),
+                {"new_id": new_id, "old_id": grad.id}
+            )
+            # Обновляем id выпускника
+            grad.id = new_id
+            new_id += 1
+        db.session.commit()
+
+        flash('Выпускник удалён, ID переиндексированы!', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Ошибка при удалении: {str(e)}', 'danger')
+        flash(f'Ошибка при удалении или переиндексации: {str(e)}', 'danger')
     return redirect(url_for('main.index'))
 
 # Загрузка данных из CSV
