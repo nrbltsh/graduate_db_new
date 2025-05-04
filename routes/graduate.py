@@ -36,6 +36,7 @@ def add():
             faculty = request.form['faculty'].strip()
             graduation_year = request.form['graduation_year'].strip()
             bio = request.form['bio'].strip() or ''
+            tags_input = request.form.get('tags', '').strip()
 
             # Валидация обязательных полей
             if not name:
@@ -71,11 +72,10 @@ def add():
                     logger.debug("No file selected or empty filename")
 
             # Обработка тегов
-            tags_input = request.form.getlist('tags')
             tags = []
-            for tag_name in tags_input:
-                tag_name = tag_name.strip()
-                if tag_name:
+            if tags_input:
+                tag_names = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+                for tag_name in tag_names:
                     tag = Tag.query.filter_by(name=tag_name).first()
                     if not tag:
                         tag = Tag(name=tag_name)
@@ -101,7 +101,7 @@ def add():
             flash(f'Ошибка при добавлении выпускника: {str(e)}', 'danger')
             return redirect(url_for('graduate.add'))
 
-    return render_template('add.html', tags=Tag.query.all())
+    return render_template('add.html')
 
 # Страница редактирования выпускника
 @graduate_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -119,6 +119,7 @@ def edit(id):
             faculty = request.form['faculty'].strip()
             graduation_year = request.form['graduation_year'].strip()
             bio = request.form['bio'].strip() or ''
+            tags_input = request.form.get('tags', '').strip()
 
             # Валидация обязательных полей
             if not name:
@@ -158,11 +159,11 @@ def edit(id):
                 else:
                     logger.debug("No file selected or empty filename")
 
-            tags_input = request.form.getlist('tags')
+            # Обработка тегов
             tags = []
-            for tag_name in tags_input:
-                tag_name = tag_name.strip()
-                if tag_name:
+            if tags_input:
+                tag_names = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+                for tag_name in tag_names:
                     tag = Tag.query.filter_by(name=tag_name).first()
                     if not tag:
                         tag = Tag(name=tag_name)
@@ -179,7 +180,9 @@ def edit(id):
             flash(f'Ошибка при обновлении данных: {str(e)}', 'danger')
             return redirect(url_for('graduate.edit', id=id))
 
-    return render_template('edit.html', graduate=graduate, tags=Tag.query.all())
+    # Передаем текущие теги как строку, разделенную запятыми
+    current_tags = ', '.join(tag.name for tag in graduate.tags)
+    return render_template('edit.html', graduate=graduate, current_tags=current_tags)
 
 # Удаление выпускника с переиндексацией id
 @graduate_bp.route('/delete/<int:id>')
@@ -267,11 +270,11 @@ def upload():
                             flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска должен быть числом.", 'danger')
                             continue
 
-                        tags_input = row['Теги'].split(',') if row['Теги'] else []
+                        tags_input = row['Теги'].strip()
                         tags = []
-                        for tag_name in tags_input:
-                            tag_name = tag_name.strip()
-                            if tag_name:
+                        if tags_input:
+                            tag_names = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+                            for tag_name in tag_names:
                                 tag = Tag.query.filter_by(name=tag_name).first()
                                 if not tag:
                                     tag = Tag(name=tag_name)

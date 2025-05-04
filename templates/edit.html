@@ -31,32 +31,10 @@
         {% endif %}
     </div>
     <div class="mb-3">
-        <label class="form-label">Теги (выберите или введите новые)</label>
-        <select class="form-control tags-select" name="tags" multiple>
-            {% for tag in tags %}
-            <option value="{{ tag.name }}" {% if tag.name in graduate.tags|map(attribute='name') %}selected{% endif %}>{{ tag.name }}</option>
-            {% endfor %}
-        </select>
+        <label class="form-label">Теги (введите через запятую, например: тег1, тег2)</label>
+        <input type="text" class="form-control" name="tags" value="{{ current_tags }}" placeholder="Введите теги, например: разработчик, выпускник">
     </div>
     <button type="submit" class="btn btn-primary">Сохранить</button>
     <a href="{{ url_for('main.graduate', id=graduate.id) }}" class="btn btn-secondary">Отмена</a>
 </form>
-
-<!-- Подключение Choices.js только для тегов -->
-<link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Инициализация для тегов
-        const tagsSelect = document.querySelector('.tags-select');
-        new Choices(tagsSelect, {
-            removeItemButton: true,
-            allowHTML: false,
-            placeholderValue: 'Введите теги',
-            noResultsText: 'Тег не найден, введите новый',
-            addItems: true,
-            duplicateItemsAllowed: false,
-        });
-    });
-</script>
 {% endblock %}
