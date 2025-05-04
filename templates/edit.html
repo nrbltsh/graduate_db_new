@@ -13,7 +13,7 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Год выпуска</label>
-        <input type="text" class="form-control" name="graduation_year" value="{{ graduate.graduation_year }}" required>
+        <input type="number" class="form-control" name="graduation_year" value="{{ graduate.graduation_year }}" min="1900" max="2100" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Факультет</label>
@@ -37,8 +37,8 @@
         {% endif %}
     </div>
     <div class="mb-3">
-        <label class="form-label">Теги (введите через запятую, например: тег1, тег2)</label>
-        <input type="text" class="form-control" name="tags" value="{{ current_tags }}" placeholder="Введите теги, например: разработчик, выпускник">
+        <label class="form-label">Теги (введите через запятую, например: тег1, тег2) </label>
+        <input type="text" class="form-control" name="tags" value="{{ current_tags }}" placeholder="Введите теги">
     </div>
     <button type="submit" class="btn btn-primary">Сохранить</button>
     <a href="{{ url_for('main.graduate', id=graduate.id) }}" class="btn btn-secondary">Отмена</a>

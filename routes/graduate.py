@@ -51,6 +51,14 @@ def add():
             if not graduation_year:
                 flash('Год выпуска не может быть пустым.', 'danger')
                 return redirect(url_for('graduate.add'))
+            # Валидация года выпуска
+            if not graduation_year.isdigit():
+                flash('Год выпуска должен быть числом.', 'danger')
+                return redirect(url_for('graduate.add'))
+            year = int(graduation_year)
+            if not (1900 <= year <= 2100):
+                flash('Год выпуска должен быть в диапазоне 1900–2100.', 'danger')
+                return redirect(url_for('graduate.add'))
 
             photo_path = None
             if 'photo' in request.files:
@@ -120,7 +128,7 @@ def edit(id):
             graduation_year = request.form['graduation_year'].strip()
             bio = request.form['bio'].strip() or ''
             tags_input = request.form.get('tags', '').strip()
-            remove_photo = 'remove_photo' in request.form  # Проверка флажка удаления фото
+            remove_photo = 'remove_photo' in request.form
 
             # Валидация обязательных полей
             if not name:
@@ -135,6 +143,14 @@ def edit(id):
             if not graduation_year:
                 flash('Год выпуска не может быть пустым.', 'danger')
                 return redirect(url_for('graduate.edit', id=id))
+            # Валидация года выпуска
+            if not graduation_year.isdigit():
+                flash('Год выпуска должен быть числом.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
+            year = int(graduation_year)
+            if not (1900 <= year <= 2100):
+                flash('Год выпуска должен быть в диапазоне 1900–2100.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
 
             graduate.name = name
             graduate.group = group
@@ -144,7 +160,6 @@ def edit(id):
 
             # Обработка фото
             if remove_photo:
-                # Удаляем текущее фото
                 if graduate.photo:
                     photo_path = os.path.join(ensure_upload_folder(), graduate.photo)
                     if os.path.exists(photo_path):
@@ -157,13 +172,11 @@ def edit(id):
                 logger.debug(f"Received file: {file.filename if file else 'None'}")
                 if file and file.filename:
                     if allowed_file(file.filename, current_app.config.get('ALLOWED_EXTENSIONS', {'jpg', 'jpeg', 'png'})):
-                        # Удаляем старое фото, если оно есть
                         if graduate.photo:
                             old_photo_path = os.path.join(ensure_upload_folder(), graduate.photo)
                             if os.path.exists(old_photo_path):
                                 os.remove(old_photo_path)
                                 logger.debug(f"Deleted old photo: {old_photo_path}")
-                        # Сохраняем новое фото
                         filename = secure_filename(file.filename)
                         upload_folder = ensure_upload_folder()
                         file_path = os.path.join(upload_folder, filename)
@@ -198,7 +211,6 @@ def edit(id):
             flash(f'Ошибка при обновлении данных: {str(e)}', 'danger')
             return redirect(url_for('graduate.edit', id=id))
 
-    # Передаем текущие теги как строку, разделенную запятыми
     current_tags = ', '.join(tag.name for tag in graduate.tags)
     return render_template('edit.html', graduate=graduate, current_tags=current_tags)
 
@@ -211,20 +223,16 @@ def delete(id):
         return redirect(url_for('main.index'))
     graduate = Graduate.query.get_or_404(id)
     try:
-        # Удаляем запись
         db.session.delete(graduate)
         db.session.commit()
 
-        # Переиндексация оставшихся записей
         graduates = Graduate.query.order_by(Graduate.id).all()
         new_id = 1
         for grad in graduates:
-            # Обновляем связи в graduate_tags
             db.session.execute(
                 db.text("UPDATE graduate_tags SET graduate_id = :new_id WHERE graduate_id = :old_id"),
                 {"new_id": new_id, "old_id": grad.id}
             )
-            # Обновляем id выпускника
             grad.id = new_id
             new_id += 1
         db.session.commit()
@@ -284,8 +292,12 @@ def upload():
                         if not graduation_year:
                             flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска не может быть пустым.", 'danger')
                             continue
-                        if graduation_year and not graduation_year.isdigit():
+                        if not graduation_year.isdigit():
                             flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска должен быть числом.", 'danger')
+                            continue
+                        year = int(graduation_year)
+                        if not (1900 <= year <= 2100):
+                            flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска должен быть в диапазоне 1900–2100.", 'danger')
                             continue
 
                         tags_input = row['Теги'].strip()

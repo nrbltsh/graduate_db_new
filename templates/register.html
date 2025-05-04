@@ -5,11 +5,11 @@
 <form method="post" id="registerForm">
     <div class="mb-3">
         <label class="form-label">Имя пользователя</label>
-        <input type="text" class="form-control" name="username" required>
+        <input type="text" class="form-control" name="username" pattern="[a-zA-Z0-9_]+" minlength="3" title="Только латинские буквы, цифры или подчеркивание, минимум 3 символа" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Пароль</label>
-        <input type="password" class="form-control" name="password" required>
+        <input type="password" class="form-control" name="password" pattern="[a-zA-Z0-9!@#$%^&*_-]+" minlength="8" title="Минимум 8 символов, только латинские буквы, цифры или символы !@#$%^&*_- " required>
     </div>
     <div class="mb-3">
         <label class="form-label">Роль</label>

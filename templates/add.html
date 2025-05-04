@@ -9,15 +9,15 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Группа</label>
-        <input type="text" class="form-control" name="group" placeholder="Введите группу, например, ПИ-1-21" required>
+        <input type="text" class="form-control" name="group" placeholder="Введите группу" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Год выпуска</label>
-        <input type="text" class="form-control" name="graduation_year" required>
+        <input type="number" class="form-control" name="graduation_year" min="1900" max="2100" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Факультет</label>
-        <input type="text" class="form-control" name="faculty" placeholder="Введите факультет, например, ИТ" required>
+        <input type="text" class="form-control" name="faculty" placeholder="Введите факультет" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Биография</label>
@@ -29,7 +29,7 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Теги (введите через запятую, например: тег1, тег2)</label>
-        <input type="text" class="form-control" name="tags" placeholder="Введите теги, например: разработчик, выпускник">
+        <input type="text" class="form-control" name="tags" placeholder="Введите теги">
     </div>
     <button type="submit" class="btn btn-primary">Добавить</button>
     <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>

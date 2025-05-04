@@ -5,13 +5,13 @@
 <form method="post">
     <div class="mb-3">
         <label class="form-label">Имя пользователя</label>
-        <input type="text" class="form-control" name="username" required>
+        <input type="text" class="form-control" name="username" pattern="[a-zA-Z0-9_]+" title="Только латинские буквы, цифры или подчеркивание" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Пароль</label>
         <input type="password" class="form-control" name="password" required>
     </div>
     <button type="submit" class="btn btn-primary">Войти</button>
+    <p class="mt-3">Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрируйтесь</a></p>
 </form>
-<p class="mt-3">Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрируйтесь</a></p>
 {% endblock %}
