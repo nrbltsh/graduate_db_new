@@ -8,7 +8,6 @@ import io
 
 graduate_bp = Blueprint('graduate', __name__)
 
-
 # Страница добавления выпускника
 @graduate_bp.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -18,6 +17,27 @@ def add():
         return redirect(url_for('main.index'))
     if request.method == 'POST':
         try:
+            # Получение данных из формы
+            name = request.form['name'].strip()
+            group = request.form['group'].strip()
+            faculty = request.form['faculty'].strip()
+            graduation_year = request.form['graduation_year'].strip()
+            bio = request.form['bio'].strip() or ''
+
+            # Валидация обязательных полей
+            if not name:
+                flash('Имя не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.add'))
+            if not group:
+                flash('Группа не может быть пустой.', 'danger')
+                return redirect(url_for('graduate.add'))
+            if not faculty:
+                flash('Факультет не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.add'))
+            if not graduation_year:
+                flash('Год выпуска не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.add'))
+
             photo_path = None
             if 'photo' in request.files:
                 file = request.files['photo']
@@ -26,6 +46,7 @@ def add():
                     file.save(os.path.join(graduate_bp.app.config['UPLOAD_FOLDER'], filename))
                     photo_path = filename
 
+            # Обработка тегов
             tags_input = request.form.getlist('tags')
             tags = []
             for tag_name in tags_input:
@@ -38,11 +59,11 @@ def add():
                     tags.append(tag)
 
             graduate = Graduate(
-                name=request.form['name'],
-                group=request.form['group'],
-                graduation_year=request.form['graduation_year'],
-                faculty=request.form['faculty'],
-                bio=request.form['bio'],
+                name=name,
+                group=group,
+                graduation_year=graduation_year,
+                faculty=faculty,
+                bio=bio,
                 photo=photo_path
             )
             graduate.tags = tags
@@ -51,15 +72,11 @@ def add():
             flash('Выпускник успешно добавлен!', 'success')
             return redirect(url_for('main.index'))
         except Exception as e:
-            flash(str(e), 'danger')
+            db.session.rollback()
+            flash(f'Ошибка при добавлении выпускника: {str(e)}', 'danger')
+            return redirect(url_for('graduate.add'))
 
-    groups = db.session.query(Graduate.group).distinct().all()
-    groups = [group[0] for group in groups if group[0]]
-    faculties = db.session.query(Graduate.faculty).distinct().all()
-    faculties = [faculty[0] for faculty in faculties if faculty[0]]
-
-    return render_template('add.html', tags=Tag.query.all(), groups=groups, faculties=faculties)
-
+    return render_template('add.html', tags=Tag.query.all())
 
 # Страница редактирования выпускника
 @graduate_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -71,11 +88,32 @@ def edit(id):
     graduate = Graduate.query.get_or_404(id)
     if request.method == 'POST':
         try:
-            graduate.name = request.form['name']
-            graduate.group = request.form['group']
-            graduate.graduation_year = request.form['graduation_year']
-            graduate.faculty = request.form['faculty']
-            graduate.bio = request.form['bio']
+            # Получение данных из формы
+            name = request.form['name'].strip()
+            group = request.form['group'].strip()
+            faculty = request.form['faculty'].strip()
+            graduation_year = request.form['graduation_year'].strip()
+            bio = request.form['bio'].strip() or ''
+
+            # Валидация обязательных полей
+            if not name:
+                flash('Имя не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
+            if not group:
+                flash('Группа не может быть пустой.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
+            if not faculty:
+                flash('Факультет не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
+            if not graduation_year:
+                flash('Год выпуска не может быть пустым.', 'danger')
+                return redirect(url_for('graduate.edit', id=id))
+
+            graduate.name = name
+            graduate.group = group
+            graduate.graduation_year = graduation_year
+            graduate.faculty = faculty
+            graduate.bio = bio
 
             if 'photo' in request.files:
                 file = request.files['photo']
@@ -100,15 +138,11 @@ def edit(id):
             flash('Данные выпускника обновлены!', 'success')
             return redirect(url_for('main.graduate', id=graduate.id))
         except Exception as e:
-            flash(str(e), 'danger')
+            db.session.rollback()
+            flash(f'Ошибка при обновлении данных: {str(e)}', 'danger')
+            return redirect(url_for('graduate.edit', id=id))
 
-    groups = db.session.query(Graduate.group).distinct().all()
-    groups = [group[0] for group in groups if group[0]]
-    faculties = db.session.query(Graduate.faculty).distinct().all()
-    faculties = [faculty[0] for faculty in faculties if faculty[0]]
-
-    return render_template('edit.html', graduate=graduate, tags=Tag.query.all(), groups=groups, faculties=faculties)
-
+    return render_template('edit.html', graduate=graduate, tags=Tag.query.all())
 
 # Удаление выпускника
 @graduate_bp.route('/delete/<int:id>')
@@ -118,11 +152,14 @@ def delete(id):
         flash('Доступ разрешён только администраторам и менеджерам.', 'danger')
         return redirect(url_for('main.index'))
     graduate = Graduate.query.get_or_404(id)
-    db.session.delete(graduate)
-    db.session.commit()
-    flash('Выпускник удалён!', 'success')
+    try:
+        db.session.delete(graduate)
+        db.session.commit()
+        flash('Выпускник удалён!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Ошибка при удалении: {str(e)}', 'danger')
     return redirect(url_for('main.index'))
-
 
 # Загрузка данных из CSV
 @graduate_bp.route('/upload', methods=['GET', 'POST'])
@@ -153,17 +190,30 @@ def upload():
                 added = 0
                 for row in csv_reader:
                     try:
-                        # Пропускаем пустые строки
                         if not row['Имя'].strip():
                             continue
 
-                        # Проверка года выпуска
+                        name = row['Имя'].strip()
+                        group = row['Группа'].strip()
+                        faculty = row['Факультет'].strip()
                         graduation_year = row['Год выпуска'].strip()
+
+                        if not name:
+                            flash(f"Ошибка в строке {csv_reader.line_num}: Имя не может быть пустым.", 'danger')
+                            continue
+                        if not group:
+                            flash(f"Ошибка в строке {csv_reader.line_num}: Группа не может быть пустой.", 'danger')
+                            continue
+                        if not faculty:
+                            flash(f"Ошибка в строке {csv_reader.line_num}: Факультет не может быть пустым.", 'danger')
+                            continue
+                        if not graduation_year:
+                            flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска не может быть пустым.", 'danger')
+                            continue
                         if graduation_year and not graduation_year.isdigit():
                             flash(f"Ошибка в строке {csv_reader.line_num}: Год выпуска должен быть числом.", 'danger')
                             continue
 
-                        # Обработка тегов
                         tags_input = row['Теги'].split(',') if row['Теги'] else []
                         tags = []
                         for tag_name in tags_input:
@@ -175,14 +225,13 @@ def upload():
                                     db.session.add(tag)
                                 tags.append(tag)
 
-                        # Создание выпускника
                         graduate = Graduate(
-                            name=row['Имя'].strip(),
-                            group=row['Группа'].strip() or None,
-                            graduation_year=row['Год выпуска'].strip() or None,
-                            faculty=row['Факультет'].strip() or None,
-                            bio=row['Биография'].strip() or None,
-                            photo=None  # Фото через CSV не загружаем
+                            name=name,
+                            group=group,
+                            graduation_year=graduation_year,
+                            faculty=faculty,
+                            bio=row['Биография'].strip() or '',
+                            photo=None
                         )
                         graduate.tags = tags
                         db.session.add(graduate)
@@ -197,5 +246,6 @@ def upload():
             else:
                 flash('Файл должен быть в формате CSV.', 'danger')
         except Exception as e:
+            db.session.rollback()
             flash(f'Ошибка при обработке файла: {str(e)}', 'danger')
     return render_template('upload.html')
