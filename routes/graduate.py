@@ -120,6 +120,7 @@ def edit(id):
             graduation_year = request.form['graduation_year'].strip()
             bio = request.form['bio'].strip() or ''
             tags_input = request.form.get('tags', '').strip()
+            remove_photo = 'remove_photo' in request.form  # Проверка флажка удаления фото
 
             # Валидация обязательных полей
             if not name:
@@ -141,11 +142,28 @@ def edit(id):
             graduate.faculty = faculty
             graduate.bio = bio
 
-            if 'photo' in request.files:
+            # Обработка фото
+            if remove_photo:
+                # Удаляем текущее фото
+                if graduate.photo:
+                    photo_path = os.path.join(ensure_upload_folder(), graduate.photo)
+                    if os.path.exists(photo_path):
+                        os.remove(photo_path)
+                        logger.debug(f"Deleted photo: {photo_path}")
+                    graduate.photo = None
+                    logger.debug("Photo field cleared")
+            elif 'photo' in request.files:
                 file = request.files['photo']
                 logger.debug(f"Received file: {file.filename if file else 'None'}")
                 if file and file.filename:
                     if allowed_file(file.filename, current_app.config.get('ALLOWED_EXTENSIONS', {'jpg', 'jpeg', 'png'})):
+                        # Удаляем старое фото, если оно есть
+                        if graduate.photo:
+                            old_photo_path = os.path.join(ensure_upload_folder(), graduate.photo)
+                            if os.path.exists(old_photo_path):
+                                os.remove(old_photo_path)
+                                logger.debug(f"Deleted old photo: {old_photo_path}")
+                        # Сохраняем новое фото
                         filename = secure_filename(file.filename)
                         upload_folder = ensure_upload_folder()
                         file_path = os.path.join(upload_folder, filename)

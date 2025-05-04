@@ -27,7 +27,13 @@
         <label class="form-label">Фото</label>
         <input type="file" class="form-control" name="photo" accept="image/*">
         {% if graduate.photo %}
-        <p>Текущее фото: <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" style="max-width: 100px;"></p>
+        <p class="mt-2">
+            Текущее фото: <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" style="max-width: 100px;">
+        </p>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="remove_photo" id="remove_photo">
+            <label class="form-check-label" for="remove_photo">Удалить текущее фото</label>
+        </div>
         {% endif %}
     </div>
     <div class="mb-3">
