@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}О проекте{% endblock %}
 {% block content %}
-<h1>О проекте</h1>
+<h1 class="mb-4">О проекте</h1>
+
 <p>Это веб-приложение для управления базой данных выпускников. Вы можете добавлять, просматривать и искать информацию о выпускниках.</p>
+
+<div class="card mt-5 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        Информация о проекте
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Выпускная квалификационная работа (ВКР)</h5>
+        <p class="card-text mb-2"><strong>ФИО студента:</strong> Акматбеков Баэль</p>
+        <p class="card-text mb-2"><strong>Учебное заведение:</strong> Кыргызский национальный университет имени Ж. Баласагына (КНУ)</p>
+        <p class="card-text mb-2"><strong>Факультет:</strong> Информатика и программная инженерия</p>
+        <p class="card-text mb-2"><strong>Курс:</strong> 4</p>
+        <p class="card-text"><strong>Цель проекта:</strong> Разработка веб-приложения для учёта и поиска выпускников университета в рамках выпускной квалификационной работы.</p>
+    </div>
+</div>
 {% endblock %}
