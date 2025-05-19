@@ -28,11 +28,76 @@
 <div class="mb-3">
     <a href="{{ url_for('main.export', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-success">Экспорт в CSV</a>
     <a href="{{ url_for('main.export_pdf', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-info ms-2">Экспорт в PDF</a>
+    <a href="{{ url_for('main.export_excel', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-primary ms-2">Экспорт в Excel</a>
     {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
     <a href="{{ url_for('graduate.add') }}" class="btn btn-primary ms-2">Добавить выпускника</a>
     {% endif %}
 </div>
 
+<!-- Форма для массового удаления -->
+{% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+<form id="deleteMultipleForm" method="post" action="{{ url_for('graduate.delete_multiple') }}">
+    {% if csrf_token %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+    <div class="mb-3">
+        <button type="submit" class="btn btn-danger" id="deleteMultipleButton" disabled>Удалить выбранные</button>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>Фото</th>
+                <th>
+                    <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">ID</a>
+                </th>
+                <th>
+                    <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Имя</a>
+                </th>
+                <th>
+                    <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Группа</a>
+                </th>
+                <th>
+                    <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Год выпуска</a>
+                </th>
+                <th>
+                    <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Факультет</a>
+                </th>
+                <th>Теги</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for graduate in graduates %}
+            <tr>
+                <td><input type="checkbox" name="graduate_ids" value="{{ graduate.id }}" class="graduate-checkbox"></td>
+                <td>
+                    {% if graduate.photo %}
+                    <img src="{{ url_for('static', filename='uploads/' + graduate.photo) }}" alt="Photo" style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No photo" style="width: 50px; height: 50px; object-fit: cover;">
+                    {% endif %}
+                </td>
+                <td>{{ graduate.id }}</td>
+                <td><a href="{{ url_for('main.graduate', id=graduate.id) }}">{{ graduate.name }}</a></td>
+                <td>{{ graduate.group }}</td>
+                <td>{{ graduate.graduation_year }}</td>
+                <td>{{ graduate.faculty }}</td>
+                <td>
+                    {% for tag in graduate.tags %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% else %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -53,9 +118,6 @@
                 <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Факультет</a>
             </th>
             <th>Теги</th>
-            {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-            <th>Действия</th>
-            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -78,16 +140,11 @@
                 <span class="badge bg-secondary">{{ tag.name }}</span>
                 {% endfor %}
             </td>
-            {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-            <td>
-                <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
-                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
-            </td>
-            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
 
 <!-- Пагинация -->
 {% if pagination.pages > 1 %}
@@ -98,7 +155,6 @@
             <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Предыдущая</a>
         </li>
         {% endif %}
-
         {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=3, right_edge=1) %}
             {% if page_num %}
                 {% if page_num == pagination.page %}
@@ -116,7 +172,6 @@
                 </li>
             {% endif %}
         {% endfor %}
-
         {% if pagination.has_next %}
         <li class="page-item">
             <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Следующая</a>
@@ -125,4 +180,111 @@
     </ul>
 </nav>
 {% endif %}
+
+<!-- Модальное окно для одиночного удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить выбранного выпускника?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Удалить</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для массового удаления -->
+<div class="modal fade" id="deleteMultipleModal" tabindex="-1" aria-labelledby="deleteMultipleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteMultipleModalLabel">Подтверждение массового удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить выбранных выпускников?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteMultiple">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript для управления чекбоксами и массовым удалением -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.graduate-checkbox');
+        const deleteButton = document.getElementById('deleteMultipleButton');
+        const form = document.getElementById('deleteMultipleForm');
+
+        // Функция для обновления состояния кнопки удаления
+        function toggleDeleteButton() {
+            const checkedCount = document.querySelectorAll('.graduate-checkbox:checked').length;
+            deleteButton.disabled = checkedCount === 0;
+            console.log(`Выбрано чекбоксов: ${checkedCount}`);
+        }
+
+        // Выбор всех чекбоксов
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            toggleDeleteButton();
+            console.log(`Выбор всех: ${this.checked}`);
+        });
+
+        // Обновление при изменении отдельных чекбоксов
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleDeleteButton();
+                console.log(`Чекбокс ID ${checkbox.value} изменён: ${checkbox.checked}`);
+            });
+        });
+
+        // Подтверждение массового удаления
+        deleteButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const checkedCount = document.querySelectorAll('.graduate-checkbox:checked').length;
+            console.log(`Нажата кнопка удаления, выбрано: ${checkedCount}`);
+            if (checkedCount > 0) {
+                document.querySelector('#deleteMultipleModal .modal-body').innerText =
+                    `Вы уверены, что хотите удалить ${checkedCount} выпускников?`;
+                new bootstrap.Modal(document.getElementById('deleteMultipleModal')).show();
+            } else {
+                console.log('Нет выбранных чекбоксов для удаления');
+            }
+        });
+
+        // Отправка формы при подтверждении
+        document.getElementById('confirmDeleteMultiple').addEventListener('click', function() {
+            const checkedIds = Array.from(document.querySelectorAll('.graduate-checkbox:checked')).map(cb => cb.value);
+            console.log(`Подтверждено удаление, IDs: ${checkedIds}`);
+            form.submit();
+        });
+
+        // Поддержка одиночного удаления
+        document.querySelectorAll('[data-bs-target="#deleteModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('confirmDelete').href = this.dataset.deleteUrl;
+                console.log(`Одиночное удаление для URL: ${this.dataset.deleteUrl}`);
+            });
+        });
+
+        // Отладка отправки формы
+        form.addEventListener('submit', function(e) {
+            const checkedIds = Array.from(document.querySelectorAll('.graduate-checkbox:checked')).map(cb => cb.value);
+            console.log(`Отправка формы с IDs: ${checkedIds}`);
+        });
+    });
+</script>
 {% endblock %}
