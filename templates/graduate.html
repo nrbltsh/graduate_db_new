@@ -11,6 +11,9 @@
     <p><strong>Группа:</strong> {{ graduate.group }}</p>
     <p><strong>Год выпуска:</strong> {{ graduate.graduation_year }}</p>
     <p><strong>Институт:</strong> {{ graduate.faculty }}</p>
+    <p><strong>Email:</strong> {{ graduate.email_file or 'Нет информации' }}</p>
+    <p><strong>Номер телефона:</strong> {{ graduate.phone or 'Нет информации' }}</p>
+    <p><strong>Место работы:</strong> {{ graduate.work or 'Нет информации' }}</p>
     <p><strong>Биография:</strong> {{ graduate.bio or 'Нет информации' }}</p>
     <p><strong672>Направление (Образовательная программа):</strong>
         {% for tag in graduate.tags %}

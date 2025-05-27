@@ -43,6 +43,9 @@ def add():
             group = request.form['group'].strip()
             faculty = request.form['faculty'].strip()
             graduation_year = request.form['graduation_year'].strip()
+            email_file = request.form['email_file'].strip() or ''
+            phone = request.form['phone'].strip() or ''
+            work = request.form['work'].strip() or ''
             bio = request.form['bio'].strip() or ''
             tags_input = request.form.get('tags', '').strip()
 
@@ -103,6 +106,9 @@ def add():
                 group=group,
                 graduation_year=graduation_year,
                 faculty=faculty,
+                email_file=email_file,
+                phone=phone,
+                work=work,
                 bio=bio,
                 photo=photo_path
             )
@@ -135,6 +141,9 @@ def edit(id):
             group = request.form['group'].strip()
             faculty = request.form['faculty'].strip()
             graduation_year = request.form['graduation_year'].strip()
+            email_file = request.form['email_file'].strip() or ''
+            phone = request.form['phone'].strip() or ''
+            work = request.form['work'].strip() or ''
             bio = request.form['bio'].strip() or ''
             tags_input = request.form.get('tags', '').strip()
             remove_photo = 'remove_photo' in request.form
@@ -165,6 +174,9 @@ def edit(id):
             graduate.group = group
             graduate.graduation_year = graduation_year
             graduate.faculty = faculty
+            graduate.email_file = email_file
+            graduate.phone = phone
+            graduate.work = work
             graduate.bio = bio
 
             # Обработка фото
@@ -327,7 +339,7 @@ def upload():
                 logger.debug(f"Обработка файла: {filename}, расширение: {file_extension}")
 
                 # Ожидаемые заголовки
-                expected_headers = ['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Биография', 'Направление (Образовательная программа)']
+                expected_headers = ['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Email', 'Номер телефона', 'Место работы', 'Биография', 'Направление (Образовательная программа)']
 
                 # Чтение файла в зависимости от формата
                 if file_extension == 'csv':
@@ -341,7 +353,7 @@ def upload():
                 # Проверка наличия ожидаемых заголовков
                 if not all(header in df.columns for header in expected_headers):
                     flash(
-                        'Неверный формат файла. Ожидаемые столбцы: ID, Имя, Группа, Год выпуска, Институт, Биография, Направление (Образовательная программа).',
+                        'Неверный формат файла. Ожидаемые столбцы: ID, Имя, Группа, Год выпуска, Институт, Email, Номер телефона, Место работы, Биография, Направление (Образовательная программа).',
                         'danger')
                     return redirect(url_for('graduate.upload'))
 
@@ -378,6 +390,9 @@ def upload():
                             continue
 
                         # Обработка биографии
+                        email_file = str(row['Email']).strip() if pd.notna(row['Email']) else ''
+                        phone = str(row['Номер телефона']).strip() if pd.notna(row['Номер телефона']) else ''
+                        work = str(row['Место работы']).strip() if pd.notna(row['Место работы']) else ''
                         bio = str(row['Биография']).strip() if pd.notna(row['Биография']) else ''
 
                         # Обработка тегов
@@ -398,6 +413,9 @@ def upload():
                             group=group,
                             graduation_year=graduation_year,
                             faculty=faculty,
+                            email_file=email_file,
+                            phone=phone,
+                            work=work,
                             bio=bio,
                             photo=None
                         )

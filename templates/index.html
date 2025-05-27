@@ -15,9 +15,9 @@
         <div class="col-md-3">
             <input type="text" class="form-control" name="faculty" placeholder="Институт" value="{{ faculty }}">
         </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="tags" placeholder="Направление (Образовательная программа)" value="{{ tags }}">
-        </div>
+<!--        <div class="col-md-3">-->
+<!--            <input type="text" class="form-control" name="tags" placeholder="Направление (Образовательная программа)" value="{{ tags }}">-->
+<!--        </div>-->
         <div class="col-md-1">
             <button type="submit" class="btn btn-primary w-100">Найти</button>
         </div>
@@ -26,9 +26,9 @@
 
 <!-- Кнопки экспорта и добавления -->
 <div class="mb-3">
-    <a href="{{ url_for('main.export', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-success">Экспорт в CSV</a>
-    <a href="{{ url_for('main.export_pdf', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-info ms-2">Экспорт в PDF</a>
-    <a href="{{ url_for('main.export_excel', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-primary ms-2">Экспорт в Excel</a>
+    <a href="{{ url_for('main.export', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-success">Экспорт в CSV</a>
+    <a href="{{ url_for('main.export_pdf', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-info ms-2">Экспорт в PDF</a>
+    <a href="{{ url_for('main.export_excel', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, tags=tags, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-primary ms-2">Экспорт в Excel</a>
     {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
     <a href="{{ url_for('graduate.add') }}" class="btn btn-primary ms-2">Добавить выпускника</a>
     {% endif %}
@@ -49,21 +49,23 @@
                 <th><input type="checkbox" id="selectAll"></th>
                 <th>Фото</th>
                 <th>
-                    <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">ID</a>
+                    <a href="{{ url_for('main.index', sort_by='id', sort_order='desc' if sort_by=='id' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, page=pagination.page) }}">ID</a>
                 </th>
                 <th>
-                    <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Имя</a>
+                    <a href="{{ url_for('main.index', sort_by='name', sort_order='desc' if sort_by=='name' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, page=pagination.page) }}">Имя</a>
                 </th>
                 <th>
-                    <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Группа</a>
+                    <a href="{{ url_for('main.index', sort_by='group', sort_order='desc' if sort_by=='group' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, page=pagination.page) }}">Группа</a>
                 </th>
                 <th>
-                    <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Год выпуска</a>
+                    <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email=email, phone=phone, work=work, page=pagination.page) }}">Год выпуска</a>
                 </th>
                 <th>
-                    <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, page=pagination.page) }}">Институт</a>
+                    <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email=email, phone=phone, work=work, page=pagination.page) }}">Институт</a>
                 </th>
-                <th>Направление (Образовательная программа)</th>
+                <th>Email</th>
+                <th>Номер телефона</th>
+                <th>Место работы</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -83,11 +85,9 @@
                 <td>{{ graduate.group }}</td>
                 <td>{{ graduate.graduation_year }}</td>
                 <td>{{ graduate.faculty }}</td>
-                <td>
-                    {% for tag in graduate.tags %}
-                    <span class="badge bg-secondary">{{ tag.name }}</span>
-                    {% endfor %}
-                </td>
+                <td>{{ graduate.email_file }}</td>
+                <td>{{ graduate.phone }}</td>
+                <td>{{ graduate.work }}</td>
                 <td>
                     <a href="{{ url_for('graduate.edit', id=graduate.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="{{ url_for('graduate.delete', id=graduate.id) }}">Удалить</button>
@@ -152,7 +152,7 @@
     <ul class="pagination justify-content-center">
         {% if pagination.has_prev %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Предыдущая</a>
+            <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num, name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, sort_by=sort_by, sort_order=sort_order) }}">Предыдущая</a>
         </li>
         {% endif %}
         {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=3, right_edge=1) %}
@@ -163,7 +163,7 @@
                 </li>
                 {% else %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('main.index', page=page_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">{{ page_num }}</a>
+                    <a class="page-link" href="{{ url_for('main.index', page=page_num, name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, sort_by=sort_by, sort_order=sort_order) }}">{{ page_num }}</a>
                 </li>
                 {% endif %}
             {% else %}
@@ -174,7 +174,7 @@
         {% endfor %}
         {% if pagination.has_next %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num, name=name, graduation_year=graduation_year, faculty=faculty, tags=tags, sort_by=sort_by, sort_order=sort_order) }}">Следующая</a>
+            <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num, name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file, phone=phone, work=work, sort_by=sort_by, sort_order=sort_order) }}">Следующая</a>
         </li>
         {% endif %}
     </ul>

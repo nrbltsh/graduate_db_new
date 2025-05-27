@@ -2,6 +2,12 @@
 {% block title %}Регистрация{% endblock %}
 {% block content %}
 <h1>Регистрация</h1>
+<form method="post" id="registerForm">
+    <div class="mb-3">
+        <label class="form-label">Имя пользователя</label>
+        <input type="text" class="form-control" name="username" pattern="[a-zA-Z0-9_]+" minlength="3" title="Только латинские буквы, цифры или подчеркивание, минимум 3 символа" required>
+    </div>
+    <div class="mb-3">
         <label class="form-label">Пароль</label>
         <input type="password" class="form-control" name="password" pattern="[a-zA-Z0-9!@#$%^&*_-]+" minlength="8" title="Минимум 8 символов, только латинские буквы, цифры или символы !@#$%^&*_- " required>
     </div>
@@ -9,14 +15,8 @@
         <label class="form-label">Роль</label>
         <select class="form-control" name="role" id="roleSelect" required>
             <option value="guest">Гость</option>
-         tt   <option value="manager">Менеджер</option>
+            <option value="manager">Менеджер</option>
         </select>
-<form method="post" id="registerForm">
-    <div class="mb-3">
-        <label class="form-label">Имя пользователя</label>
-        <input type="text" class="form-control" name="username" pattern="[a-zA-Z0-9_]+" minlength="3" title="Только латинские буквы, цифры или подчеркивание, минимум 3 символа" required>
-    </div>
-    <div class="mb-3">
     </div>
     <div class="mb-3" id="keywordField" style="display: none;">
         <label class="form-label">Ключевое слово (для менеджеров)</label>

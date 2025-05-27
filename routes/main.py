@@ -25,7 +25,10 @@ def index():
     name = request.args.get('name', '')
     graduation_year = request.args.get('graduation_year', '')
     faculty = request.args.get('faculty', '')
-    tags = request.args.get('tags', '')
+    email_file = request.args.get('email_file', '')
+    phone = request.args.get('phone', '')
+    work = request.args.get('work', '')
+    # tags = request.args.get('tags', '')
     page = request.args.get('page', 1, type=int)
     per_page = 100
 
@@ -36,10 +39,16 @@ def index():
         query = query.filter(Graduate.graduation_year == graduation_year)
     if faculty:
         query = query.filter(Graduate.faculty.ilike(f'%{faculty}%'))
-    if tags:
-        tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
-        for tag_name in tag_list:
-            query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
+    if email_file:
+        query = query.filter(Graduate.email_file.ilike(f'%{email_file}%'))
+    if phone:
+        query = query.filter(Graduate.phone.ilike(f'%{phone}%'))
+    if work:
+        query = query.filter(Graduate.work.ilike(f'%{work}%'))
+    # if tags:
+    #     tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
+    #     for tag_name in tag_list:
+    #         query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
 
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
@@ -49,11 +58,15 @@ def index():
 
     pagination = query.order_by(order).paginate(page=page, per_page=per_page, error_out=False)
     graduates = pagination.items
-    all_tags = Tag.query.all()
+    # all_tags = Tag.query.all()
 
     return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
-                           name=name, graduation_year=graduation_year, faculty=faculty, tags=tags,
-                           all_tags=all_tags, pagination=pagination)
+                           name=name, graduation_year=graduation_year, faculty=faculty, email_file=email_file,
+                           phone=phone, work=work, pagination=pagination)
+
+    # return render_template('index.html', graduates=graduates, sort_by=sort_by, sort_order=sort_order,
+    #                        name=name, graduation_year=graduation_year, faculty=faculty, tags=tags,
+    #                        all_tags=all_tags, pagination=pagination)
 
 # Export to CSV
 @main_bp.route('/export')
@@ -85,7 +98,7 @@ def export():
     graduates = query.order_by(order).all()
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Биография', 'Направление (Образовательная программа)'])
+    writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Email', 'Номер телефона', 'Место работы', 'Биография', 'Направление (Образовательная программа)'])
 
     for graduate in graduates:
         tags = ', '.join([tag.name for tag in graduate.tags])
@@ -95,6 +108,9 @@ def export():
             graduate.group,
             graduate.graduation_year,
             graduate.faculty,
+            graduate.email_file or '',
+            graduate.phone or '',
+            graduate.work or '',
             graduate.bio or '',
             tags
         ])
@@ -214,12 +230,15 @@ def export_excel():
                 'Группа': graduate.group,
                 'Год выпуска': graduate.graduation_year,
                 'Институт': graduate.faculty,
+                'Email': graduate.email_file or '',
+                'Номер телефона': graduate.phone or '',
+                'Место работы': graduate.work or '',
                 'Биография': graduate.bio or '',
                 'Направление (Образовательная программа)': tags
             })
 
         # Create a DataFrame
-        df = pd.DataFrame(data, columns=['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Биография', 'Направление (Образовательная программа)'])
+        df = pd.DataFrame(data, columns=['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Email', 'Номер телефона', 'Место работы', 'Биография', 'Направление (Образовательная программа)'])
 
         # Write to Excel
         output = io.BytesIO()

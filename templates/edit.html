@@ -20,6 +20,18 @@
         <input type="text" class="form-control" name="faculty" value="{{ graduate.faculty }}" required>
     </div>
     <div class="mb-3">
+        <label class="form-label">Email</label>
+        <textarea class="form-control" name="email_file" rows="1">{{ graduate.email_file or '' }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Номер телефона</label>
+        <textarea class="form-control" name="phone" rows="1">{{ graduate.phone or '' }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Место работы</label>
+        <textarea class="form-control" name="work" rows="1">{{ graduate.work or '' }}</textarea>
+    </div>
+    <div class="mb-3">
         <label class="form-label">Биография</label>
         <textarea class="form-control" name="bio" rows="5">{{ graduate.bio or '' }}</textarea>
     </div>
