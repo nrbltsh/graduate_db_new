@@ -10,9 +10,9 @@
     {% endif %}
     <p><strong>Группа:</strong> {{ graduate.group }}</p>
     <p><strong>Год выпуска:</strong> {{ graduate.graduation_year }}</p>
-    <p><strong>Факультет:</strong> {{ graduate.faculty }}</p>
+    <p><strong>Институт:</strong> {{ graduate.faculty }}</p>
     <p><strong>Биография:</strong> {{ graduate.bio or 'Нет информации' }}</p>
-    <p><strong672>Теги:</strong>
+    <p><strong672>Направление (Образовательная программа):</strong>
         {% for tag in graduate.tags %}
         <span class="badge bg-secondary">{{ tag.name }}</span>
         {% endfor %}

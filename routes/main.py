@@ -9,11 +9,16 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.units import inch
+import pandas as pd  # Import pandas for Excel export
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 main_bp = Blueprint('main', __name__)
 
-
-# Главная страница: список выпускников с фильтрацией и пагинацией
+# Main page: list of graduates with filtering and pagination
 @main_bp.route('/')
 @login_required
 def index():
@@ -22,7 +27,7 @@ def index():
     faculty = request.args.get('faculty', '')
     tags = request.args.get('tags', '')
     page = request.args.get('page', 1, type=int)
-    per_page = 10
+    per_page = 100
 
     query = Graduate.query
     if name:
@@ -50,8 +55,7 @@ def index():
                            name=name, graduation_year=graduation_year, faculty=faculty, tags=tags,
                            all_tags=all_tags, pagination=pagination)
 
-
-# Экспорт в CSV
+# Export to CSV
 @main_bp.route('/export')
 @login_required
 def export():
@@ -81,7 +85,7 @@ def export():
     graduates = query.order_by(order).all()
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Факультет', 'Биография', 'Теги'])
+    writer.writerow(['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Биография', 'Направление (Образовательная программа)'])
 
     for graduate in graduates:
         tags = ', '.join([tag.name for tag in graduate.tags])
@@ -103,8 +107,7 @@ def export():
         download_name='graduates_export.csv'
     )
 
-
-# Экспорт в PDF
+# Export to PDF
 @main_bp.route('/export_pdf')
 @login_required
 def export_pdf():
@@ -134,7 +137,7 @@ def export_pdf():
     graduates = query.order_by(order).all()
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5 * inch, bottomMargin=0.5 * inch)
-    data = [['ID', 'Имя', 'Группа', 'Год выпуска', 'Факультет', 'Теги']]
+    data = [['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Направление (Образовательная программа)']]
 
     for graduate in graduates:
         tags = ', '.join([tag.name for tag in graduate.tags])
@@ -170,23 +173,85 @@ def export_pdf():
         download_name='graduates_export.pdf'
     )
 
+# Export to Excel
+@main_bp.route('/export_excel')
+@login_required
+def export_excel():
+    name = request.args.get('name', '')
+    graduation_year = request.args.get('graduation_year', '')
+    faculty = request.args.get('faculty', '')
+    tags = request.args.get('tags', '')
 
-# Страница профиля выпускника
+    query = Graduate.query
+    if name:
+        query = query.filter(Graduate.name.ilike(f'%{name}%'))
+    if graduation_year:
+        query = query.filter(Graduate.graduation_year == graduation_year)
+    if faculty:
+        query = query.filter(Graduate.faculty.ilike(f'%{faculty}%'))
+    if tags:
+        tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
+        for tag_name in tag_list:
+            query = query.join(graduate_tags).join(Tag).filter(Tag.name.ilike(f'%{tag_name}%'))
+
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    order = getattr(Graduate, sort_by)
+    if sort_order == 'desc':
+        order = order.desc()
+
+    try:
+        graduates = query.order_by(order).all()
+        logger.debug(f"Exporting {len(graduates)} graduates to Excel with filters: name={name}, year={graduation_year}, faculty={faculty}, tags={tags}")
+
+        # Prepare data for Excel
+        data = []
+        for graduate in graduates:
+            tags = ', '.join([tag.name for tag in graduate.tags])
+            data.append({
+                'ID': graduate.id,
+                'Имя': graduate.name,
+                'Группа': graduate.group,
+                'Год выпуска': graduate.graduation_year,
+                'Институт': graduate.faculty,
+                'Биография': graduate.bio or '',
+                'Направление (Образовательная программа)': tags
+            })
+
+        # Create a DataFrame
+        df = pd.DataFrame(data, columns=['ID', 'Имя', 'Группа', 'Год выпуска', 'Институт', 'Биография', 'Направление (Образовательная программа)'])
+
+        # Write to Excel
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Graduates')
+        output.seek(0)
+
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name='graduates_export.xlsx'
+        )
+    except Exception as e:
+        logger.error(f"Error exporting to Excel: {str(e)}")
+        flash(f'Ошибка при создании Excel файла: {str(e)}', 'danger')
+        return redirect(url_for('main.index'))
+
+# Graduate profile page
 @main_bp.route('/graduate/<int:id>')
 @login_required
 def graduate(id):
     graduate = Graduate.query.get_or_404(id)
     return render_template('graduate.html', graduate=graduate)
 
-
-# Страница "О проекте"
+# About page
 @main_bp.route('/about')
 @login_required
 def about():
     return render_template('about.html')
 
-
-# Страница статистики
+# Statistics page
 @main_bp.route('/stats')
 @login_required
 def stats():

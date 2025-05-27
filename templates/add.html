@@ -16,8 +16,8 @@
         <input type="number" class="form-control" name="graduation_year" min="1900" max="2100" required>
     </div>
     <div class="mb-3">
-        <label class="form-label">Факультет</label>
-        <input type="text" class="form-control" name="faculty" placeholder="Введите факультет" required>
+        <label class="form-label">Институт</label>
+        <input type="text" class="form-control" name="faculty" placeholder="Введите институт" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Биография</label>
@@ -28,8 +28,8 @@
         <input type="file" class="form-control" name="photo" accept="image/*">
     </div>
     <div class="mb-3">
-        <label class="form-label">Теги (введите через запятую, например: тег1, тег2)</label>
-        <input type="text" class="form-control" name="tags" placeholder="Введите теги">
+        <label class="form-label">Направление (Образовательная программа)</label>
+        <input type="text" class="form-control" name="tags" placeholder="Введите направление (Образовательная программа)">
     </div>
     <button type="submit" class="btn btn-primary">Добавить</button>
     <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>

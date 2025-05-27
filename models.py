@@ -25,12 +25,12 @@ class Graduate(db.Model):
     photo = db.Column(db.String(200), nullable=True)
     tags = db.relationship('Tag', secondary='graduate_tags', backref=db.backref('graduates', lazy='dynamic'))
 
-# Модель тега
+# Модель Направление (Образовательная программа)
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
-# Таблица связи выпускников и тегов
+# Таблица связи выпускников и Направление (Образовательная программа)
 graduate_tags = db.Table('graduate_tags',
     db.Column('graduate_id', db.Integer, db.ForeignKey('graduate.id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)

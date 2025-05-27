@@ -15,7 +15,7 @@
     <div class="col">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Выпускники по факультетам</h5>
+                <h5 class="card-title">Выпускники по институтам</h5>
                 <canvas id="facultiesChart"></canvas>
             </div>
         </div>
@@ -23,7 +23,7 @@
     <div class="col">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Выпускники по тегам</h5>
+                <h5 class="card-title">Выпускники по направлениям (Образовательная программа)</h5>
                 <canvas id="tagsChart"></canvas>
             </div>
         </div>
@@ -87,7 +87,7 @@
         }
     });
 
-    // График по факультетам
+    // График по институтам
     const facultiesCtx = document.getElementById('facultiesChart').getContext('2d');
     new Chart(facultiesCtx, {
         type: 'pie',
