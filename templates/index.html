@@ -12,9 +12,9 @@
         <div class="col-md-2">
             <input type="text" class="form-control" name="graduation_year" placeholder="Год выпуска" value="{{ graduation_year }}">
         </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="faculty" placeholder="Институт" value="{{ faculty }}">
-        </div>
+<!--        <div class="col-md-3">-->
+<!--            <input type="text" class="form-control" name="faculty" placeholder="Институт" value="{{ faculty }}">-->
+<!--        </div>-->
 <!--        <div class="col-md-3">-->
 <!--            <input type="text" class="form-control" name="tags" placeholder="Направление (Образовательная программа)" value="{{ tags }}">-->
 <!--        </div>-->
@@ -60,9 +60,9 @@
                 <th>
                     <a href="{{ url_for('main.index', sort_by='graduation_year', sort_order='desc' if sort_by=='graduation_year' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email=email, phone=phone, work=work, page=pagination.page) }}">Год выпуска</a>
                 </th>
-                <th>
-                    <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email=email, phone=phone, work=work, page=pagination.page) }}">Институт</a>
-                </th>
+<!--                <th>-->
+<!--                    <a href="{{ url_for('main.index', sort_by='faculty', sort_order='desc' if sort_by=='faculty' and sort_order=='asc' else 'asc', name=name, graduation_year=graduation_year, faculty=faculty, email=email, phone=phone, work=work, page=pagination.page) }}">Институт</a>-->
+<!--                </th>-->
                 <th>Email</th>
                 <th>Номер телефона</th>
                 <th>Место работы</th>
@@ -84,7 +84,7 @@
                 <td><a href="{{ url_for('main.graduate', id=graduate.id) }}">{{ graduate.name }}</a></td>
                 <td>{{ graduate.group }}</td>
                 <td>{{ graduate.graduation_year }}</td>
-                <td>{{ graduate.faculty }}</td>
+<!--                <td>{{ graduate.faculty }}</td>-->
                 <td>{{ graduate.email_file }}</td>
                 <td>{{ graduate.phone }}</td>
                 <td>{{ graduate.work }}</td>

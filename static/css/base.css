@@ -22,6 +22,10 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     flex: 1;
 }
 
+.mt-5 {
+    margin-left: 0;
+}
+
 .img-fluid {
     border-radius: 0.25rem;
 }
